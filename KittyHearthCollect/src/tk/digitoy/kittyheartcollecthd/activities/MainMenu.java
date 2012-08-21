@@ -1,10 +1,17 @@
 package tk.digitoy.kittyheartcollecthd.activities;
 
+import java.util.List;
+
 import tk.digitoy.kittyheartcollecthd.activities.R;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.View;
@@ -23,7 +30,8 @@ public class MainMenu extends Activity {
 	public static int dispWidth;
 	public static int dispHeight;
 	boolean isVisible;
-	public static boolean effectsISOn;
+	private boolean toGame;
+	public static boolean effectsIsOn;
 	public static boolean soundIsOn;
 	// Kitty song
 	public static MediaPlayer kittySong;
@@ -42,8 +50,8 @@ public class MainMenu extends Activity {
 		infoButtonInit();
 
 		isVisible = false;
-		effectsISOn = true;
-		soundIsOn=true;
+		effectsIsOn = true;
+		soundIsOn = true;
 		soundButtonLayout();
 
 	}
@@ -55,8 +63,10 @@ public class MainMenu extends Activity {
 	}
 
 	private void playMusic() {
-		if (soundIsOn) {
+		if (kittySong == null) {
 			kittySong = MediaPlayer.create(getBaseContext(), R.raw.main_music);
+		}
+		if (soundIsOn && !kittySong.isPlaying()) {
 			kittySong.start();
 		}
 	}
@@ -74,7 +84,7 @@ public class MainMenu extends Activity {
 		playButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
+				toGame = true;
 				Intent intent = new Intent(MainMenu.this,
 						HeartCollectActivity.class);
 				startActivity(intent);
@@ -88,7 +98,7 @@ public class MainMenu extends Activity {
 		infoButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+				toGame = false;
 				Intent intent = new Intent(MainMenu.this, InfoActivity.class);
 				startActivity(intent);
 			}
@@ -126,13 +136,12 @@ public class MainMenu extends Activity {
 		soundEffectButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				if (effectsISOn) {
-					effectsISOn = !effectsISOn;
+				if (effectsIsOn) {
+					effectsIsOn = !effectsIsOn;
 					soundEffectButton
 							.setBackgroundResource(R.drawable.effects_off);
 				} else {
-					effectsISOn = !effectsISOn;
+					effectsIsOn = !effectsIsOn;
 					soundEffectButton
 							.setBackgroundResource(R.drawable.effects_on);
 				}
@@ -142,15 +151,14 @@ public class MainMenu extends Activity {
 		musicButton.setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				if (kittySong.isPlaying()) {
 					musicButton.setBackgroundResource(R.drawable.music_off);
 					kittySong.pause();
-					soundIsOn=false;
+					soundIsOn = false;
 				} else {
 					musicButton.setBackgroundResource(R.drawable.music_on);
 					kittySong.start();
-					soundIsOn=true;
+					soundIsOn = true;
 				}
 			}
 		});
@@ -165,12 +173,32 @@ public class MainMenu extends Activity {
 		super.onBackPressed();
 	}
 
+	public static boolean isApplicationSentToBackground(final Context context) {
+		ActivityManager am = (ActivityManager) context
+				.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningTaskInfo> tasks = am.getRunningTasks(1);
+		PowerManager pm = (PowerManager) context
+				.getSystemService(Context.POWER_SERVICE);
+		if (!pm.isScreenOn()) {
+			return true;
+		}
+		if (!tasks.isEmpty()) {
+			ComponentName topActivity = tasks.get(0).topActivity;
+			if (!topActivity.getPackageName().equals(context.getPackageName())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	@Override
 	protected void onPause() {
-		if (kittySong != null && kittySong.isPlaying()) {
+		if (kittySong != null
+				&& kittySong.isPlaying()
+				&& (isApplicationSentToBackground(getApplicationContext()) || toGame)) {
 			kittySong.pause();
 		}
 		super.onPause();
 	}
-
 }
