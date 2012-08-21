@@ -19,7 +19,7 @@ public class Splash extends Activity {
 		if (savedInstanceState != null) {
 			ms = savedInstanceState.getLong("ms");
 		} else {
-			ms = 3000;
+			ms = 2000;
 		}
 	}
 
