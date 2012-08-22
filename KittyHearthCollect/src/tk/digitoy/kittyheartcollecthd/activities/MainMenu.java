@@ -1,5 +1,6 @@
-package tk.digitoy.kittyheartcollect.activities;
+package tk.digitoy.kittyheartcollecthd.activities;
 
+import tk.digitoy.kittyheartcollecthd.activities.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -22,7 +23,8 @@ public class MainMenu extends Activity {
 	public static int dispWidth;
 	public static int dispHeight;
 	boolean isVisible;
-	public static boolean effectsOn;
+	public static boolean effectsISOn;
+	public static boolean soundIsOn;
 	// Kitty song
 	public static MediaPlayer kittySong;
 
@@ -40,7 +42,8 @@ public class MainMenu extends Activity {
 		infoButtonInit();
 
 		isVisible = false;
-		effectsOn = true;
+		effectsISOn = true;
+		soundIsOn=true;
 		soundButtonLayout();
 
 	}
@@ -51,9 +54,11 @@ public class MainMenu extends Activity {
 		playMusic();
 	}
 
-	public void playMusic() {
-		kittySong = MediaPlayer.create(getBaseContext(), R.raw.main_music);
-		kittySong.start();
+	private void playMusic() {
+		if (soundIsOn) {
+			kittySong = MediaPlayer.create(getBaseContext(), R.raw.main_music);
+			kittySong.start();
+		}
 	}
 
 	public void playButtonInit() {
@@ -122,12 +127,12 @@ public class MainMenu extends Activity {
 
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if (effectsOn) {
-					effectsOn = !effectsOn;
+				if (effectsISOn) {
+					effectsISOn = !effectsISOn;
 					soundEffectButton
 							.setBackgroundResource(R.drawable.effects_off);
 				} else {
-					effectsOn = !effectsOn;
+					effectsISOn = !effectsISOn;
 					soundEffectButton
 							.setBackgroundResource(R.drawable.effects_on);
 				}
@@ -141,9 +146,11 @@ public class MainMenu extends Activity {
 				if (kittySong.isPlaying()) {
 					musicButton.setBackgroundResource(R.drawable.music_off);
 					kittySong.pause();
+					soundIsOn=false;
 				} else {
 					musicButton.setBackgroundResource(R.drawable.music_on);
 					kittySong.start();
+					soundIsOn=true;
 				}
 			}
 		});

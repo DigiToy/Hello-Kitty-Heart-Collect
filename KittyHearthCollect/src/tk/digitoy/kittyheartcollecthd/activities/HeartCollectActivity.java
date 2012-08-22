@@ -1,8 +1,9 @@
-package tk.digitoy.kittyheartcollect.activities;
+package tk.digitoy.kittyheartcollecthd.activities;
 
 import java.util.ArrayList;
 
-import tk.digitoy.kittyheartcollect.activities.HeartCollectActivity.GameView.GameFigure;
+import tk.digitoy.kittyheartcollecthd.activities.R;
+import tk.digitoy.kittyheartcollecthd.activities.HeartCollectActivity.GameView.GameFigure;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -139,17 +140,24 @@ public class HeartCollectActivity extends Activity {
 							.setAnimation(new TranslateAnimation(0, 0, 0, 10));
 
 					isVisible = true;
-				} else {
-					layoutPause.setAnimation(new TranslateAnimation(0, 0, 0,
-							-10));
-					layoutPause.setVisibility(View.GONE);
-					isVisible = false;
-				}
+				} 
+//				else {
+//					layoutPause.setAnimation(new TranslateAnimation(0, 0, 0,
+//							-10));
+//					layoutPause.setVisibility(View.GONE);
+//					isVisible = false;
+//					for (int i = 0; i < figuresArray.size(); i++) {
+//						figuresArray.get(i).continueRun();
+//
+//					}
+//					runOnUiThread(timerRun);
+//				}
 				for (int i = 0; i < figuresArray.size(); i++) {
 					figuresArray.get(i).pause();
 
 				}
 				myHandler.removeCallbacks(timerRun);
+				pauseButton.setVisibility(View.INVISIBLE);
 			}
 
 		});
@@ -158,9 +166,9 @@ public class HeartCollectActivity extends Activity {
 
 			public void onClick(View v) {
 
-				layoutPause.setVisibility(View.INVISIBLE);
+				
 				layoutPause.setAnimation(new TranslateAnimation(0, 0, 0, -10));
-
+				layoutPause.setVisibility(View.INVISIBLE);
 				isVisible = false;
 
 				for (int i = 0; i < figuresArray.size(); i++) {
@@ -168,6 +176,20 @@ public class HeartCollectActivity extends Activity {
 
 				}
 				runOnUiThread(timerRun);
+				pauseButton.setVisibility(View.VISIBLE);
+			}
+		});
+		
+		replayButton.setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				closeAllThreads();
+				
+				Intent intent = new Intent(HeartCollectActivity.this,
+						HeartCollectActivity.class);
+				startActivity(intent);
+				finish();
 			}
 		});
 
@@ -179,9 +201,10 @@ public class HeartCollectActivity extends Activity {
 	}
 
 	public void playMusic() {
-
-		gameSong.setLooping(true);
-		gameSong.start();
+		if (MainMenu.soundIsOn) {
+			gameSong.setLooping(true);
+			gameSong.start();
+		}
 	}
 
 	private void setListeners() {
@@ -191,7 +214,7 @@ public class HeartCollectActivity extends Activity {
 				kittyBasketPosition = 1;
 				kittyBasketLeft.setBackgroundResource(R.drawable.kitty_left);
 
-				lp.topMargin = height / 7 + height / 76;
+				lp.topMargin = height / 8 + height / 76;
 				lp.leftMargin = width / 4;
 				kittyBasketLeft.setLayoutParams(lp);
 
@@ -204,7 +227,7 @@ public class HeartCollectActivity extends Activity {
 				kittyBasketPosition = 2;
 				kittyBasketLeft.setBackgroundResource(R.drawable.kitty_right);
 
-				lp.topMargin = height / 7 + height / 76;
+				lp.topMargin = height / 8 + height / 76;
 				lp.leftMargin = 3 * width / 4 - kittyBasketLeft.getWidth();
 				kittyBasketLeft.setLayoutParams(lp);
 
@@ -218,7 +241,7 @@ public class HeartCollectActivity extends Activity {
 
 				kittyBasketLeft.setBackgroundResource(R.drawable.kitty_left);
 
-				lp.topMargin = 3 * height / 7 + height / 15;
+				lp.topMargin = 3 * height / 8 + height / 15;
 				lp.leftMargin = width / 4;
 				kittyBasketLeft.setLayoutParams(lp);
 
@@ -231,7 +254,7 @@ public class HeartCollectActivity extends Activity {
 				kittyBasketPosition = 4;
 				kittyBasketLeft.setBackgroundResource(R.drawable.kitty_right);
 
-				lp.topMargin = 3 * height / 7 + height / 15;
+				lp.topMargin = 3 * height / 8 + height / 15;
 				lp.leftMargin = 3 * width / 4 - kittyBasketLeft.getWidth();
 				kittyBasketLeft.setLayoutParams(lp);
 
@@ -675,11 +698,7 @@ public class HeartCollectActivity extends Activity {
 				}
 				if (dropCount == 4) {
 
-					for (int i = 0; i < figuresArray.size(); i++) {
-						figuresArray.get(i).stop();
-
-					}
-					myHandler.removeCallbacks(timerRun);
+					closeAllThreads();
 					HeartCollectActivity.this.runOnUiThread(new Runnable() {
 
 						public void run() {
@@ -797,6 +816,15 @@ public class HeartCollectActivity extends Activity {
 
 		alertDialog.show();
 	}
+	
+	public void closeAllThreads()
+	{
+		for (int i = 0; i < figuresArray.size(); i++) {
+			figuresArray.get(i).stop();
+		}
+		figuresArray.removeAll(figuresArray);
+		myHandler.removeCallbacks(timerRun);
+	}
 
 	@Override
 	public void onBackPressed() {
@@ -805,6 +833,8 @@ public class HeartCollectActivity extends Activity {
 			gameSong.release();
 			gameSong = null;
 		}
+		closeAllThreads();
+		finish();
 		super.onBackPressed();
 	}
 

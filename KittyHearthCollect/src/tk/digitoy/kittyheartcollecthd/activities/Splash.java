@@ -1,5 +1,6 @@
-package tk.digitoy.kittyheartcollect.activities;
+package tk.digitoy.kittyheartcollecthd.activities;
 
+import tk.digitoy.kittyheartcollecthd.activities.R;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,12 +14,12 @@ public class Splash extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_splash);
+		setContentView(R.layout.splash);
 
 		if (savedInstanceState != null) {
 			ms = savedInstanceState.getLong("ms");
 		} else {
-			ms = 300;
+			ms = 3000;
 		}
 	}
 
